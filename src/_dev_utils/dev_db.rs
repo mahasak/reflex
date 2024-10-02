@@ -17,7 +17,7 @@ const SQL_DIR: &str = "sql/dev_initial";
 const DEMO_PWD: &str = "welcome";
 
 pub async fn init_dev_db() -> Result<(), Box<dyn std::error::Error>> {
-    info!("{:<12} - dev_db::init_dev_db()", "FOR-DEV-ONLY");
+    info!("{:<12} - init_dev_db()", "FOR-DEV-ONLY");
 
     // Create app db with the postgres user.
     {
@@ -36,7 +36,6 @@ pub async fn init_dev_db() -> Result<(), Box<dyn std::error::Error>> {
 
     for path in paths {
         if let Some(path) = path.to_str() {
-            info!("{:<12} - dev_db::init_dev_db - path: {path}", "FOR-DEV-ONLY");
             let path_str = path.to_string();
             if path_str.ends_with(".sql")
                 && path != SQL_RECREATE_DB
@@ -50,7 +49,7 @@ pub async fn init_dev_db() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 async fn pexec(db: &Db, file: &str) -> Result<(), sqlx::Error> {
-    info!("{:<12} - dev_db::pexec: {file:?}", "FOR-DEV-ONLY");
+    info!("{:<12} - pexec: {file:?}", "FOR-DEV-ONLY");
 
     // -- Read the file.
     let content = fs::read_to_string(file)?;
@@ -60,8 +59,8 @@ async fn pexec(db: &Db, file: &str) -> Result<(), sqlx::Error> {
 
     for sql in sqls {
         sqlx::query(sql).execute(db).await.map_err(|e| {
-            info!("dev_db::pexec error while running:\n{sql}");
-            info!("dev_db::cause:\n{e}");
+            info!("pexec error while running:\n{sql}");
+            info!("cause:\n{e}");
             e
         })?;
     }
