@@ -1,4 +1,4 @@
-use crate::{crypt, model, web};
+use crate::{crypt, model, utils, web};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use serde::Serialize;
@@ -19,7 +19,8 @@ pub enum Error {
 	// -- CtxExtError
 	CtxExt(web::mw_auth::CtxExtError),
 	// -- Modules
-	Model(model::Error)
+	Model(model::Error),
+	Crypt(crypt::Error)
 }
 
 // region:    --- Axum IntoResponse
@@ -40,6 +41,12 @@ impl IntoResponse for Error {
 impl From<model::Error> for Error {
 	fn from(e: model::Error) -> Self {
 		Self::Model(e)
+	}
+}
+
+impl From<crypt::Error> for Error {
+	fn from(e: crypt::Error) -> Self {
+		Self::Crypt(e)
 	}
 }
 
