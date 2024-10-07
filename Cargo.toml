@@ -15,6 +15,7 @@ dotenv = "0.15"
 tokio = { version = "1", features = ["full"] }
 # database
 sqlx = { version = "0.6", features = ["runtime-tokio-rustls", "uuid", "time", "postgres"] }
+sqlb = "0.3"
 derive_more = "0.99"
 # -- Json
 serde = { version = "1", features = ["derive"] }
@@ -28,6 +29,12 @@ tower-cookies = "0.9"
 # -- Tracing
 tracing = "0.1"
 tracing-subscriber = {version = "0.3", features = ["env-filter"]}
+
+# -- Crypt & Encoding
+rand = "0.8"
+hmac = "0.12"
+sha2 = "0.10"
+base64-url = "2"
 # -- Others
 uuid = {version = "1", features = ["v4","fast-rng",]}
 lazy-regex = "3"

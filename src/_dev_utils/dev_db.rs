@@ -4,6 +4,9 @@ use std::time::Duration;
 use sqlx::{Pool, Postgres};
 use sqlx::postgres::PgPoolOptions;
 use tracing::{debug, info};
+use crate::ctx::Ctx;
+use crate::model::ModelManager;
+use crate::model::user::{User, UserBmc};
 
 type Db = Pool<Postgres>;
 
@@ -44,6 +47,18 @@ pub async fn init_dev_db() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     }
+
+    // -- Init model layer
+    let mm = ModelManager::new().await.unwrap();
+    let ctx = Ctx::root_ctx();
+
+    // Set demo1 password
+    let demo1_user: User = UserBmc::first_by_username(&ctx, &mm, "demo1")
+        .await
+        .unwrap().unwrap();
+
+    UserBmc::update_pwd(&ctx, &mm, demo1_user.id,DEMO_PWD).await.unwrap();
+    info!("{:<12} - init_dev_db() - set demo1 pwd", "FOR-DEV-ONLY");
 
     Ok(())
 }

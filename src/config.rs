@@ -1,4 +1,5 @@
 use std::env;
+use std::str::FromStr;
 use std::sync::OnceLock;
 
 use crate::{Error, Result};
@@ -16,6 +17,9 @@ pub fn config() -> &'static Config {
 pub struct Config {
     pub DB_URL: String,
     pub WEB_FOLDER: String,
+    pub PWD_KEY: Vec<u8>,
+    pub TOKEN_KEY: Vec<u8>,
+    pub TOKEN_DURATION_SEC: i64,
 }
 
 impl Config {
@@ -23,10 +27,24 @@ impl Config {
         Ok(Config {
             DB_URL: get_env("SERVICE_DB_URL")?,
             WEB_FOLDER: get_env("WEB_FOLDER")?,
+            // -- Crypt
+            PWD_KEY: get_env_b64u_as_u82("SERVICE_PWD_KEY")?,
+            TOKEN_KEY: get_env_b64u_as_u82("SERVICE_TOKEN_KEY")?,
+            TOKEN_DURATION_SEC: get_env_parse("SERVICE_TOKEN_DURATION_SEC")?,
+
         })
     }
 }
 
 fn get_env(name: &'static str) -> Result<String> {
     env::var(name).map_err(|_| Error::ConfigMissingEnv(name))
+}
+
+fn get_env_b64u_as_u82(name: &'static str) -> Result<Vec<u8>> {
+    base64_url::decode(&get_env(name)?).map_err(|_| Error::ConfigWrongFormat(name))
+}
+
+fn get_env_parse<T: FromStr>(name: &'static str) -> Result<T> {
+    let val = get_env(name)?;
+    val.parse::<T>().map_err(|_| Error::ConfigWrongFormat(name))
 }
