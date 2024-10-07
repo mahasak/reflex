@@ -44,6 +44,12 @@ impl From<model::Error> for Error {
 	}
 }
 
+impl From<web::mw_auth::CtxExtError> for Error {
+	fn from(e: web::mw_auth::CtxExtError) -> Self {
+		Self::CtxExt(e)
+	}
+}
+
 impl From<crypt::Error> for Error {
 	fn from(e: crypt::Error) -> Self {
 		Self::Crypt(e)

@@ -13,10 +13,12 @@ async fn main() -> Result<()> {
 		"/api/login",
 		json!({
 			"username": "demo1",
-			"pwd": "welcomex"
+			"pwd": "welcome"
 		}),
 	);
 	req_login.await?.print().await?;
+
+	hc.do_get("/hello").await?.print().await?;
 
 	Ok(())
 }
