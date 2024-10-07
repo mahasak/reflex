@@ -2,8 +2,8 @@ use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 use axum::body::HttpBody;
 use crate::config;
-use crate::crypt::{Error, Result};
-use crate::utils::{b64u_decode, b64u_encode};
+use crate::crypt::{encrypt_into_b64u, EncryptContent, Error, Result};
+use crate::utils::{b64u_decode, b64u_encode, now_utc, now_utc_plus_sec_str, parse_utc};
 
 // region:  --- Token Type
 // String format : `ident_b64u.exp_b64u.sign_b64u`
@@ -71,7 +71,13 @@ fn _generate_token(
     salt : &str,
     key: &[u8]
 ) -> Result<Token> {
-    todo!()
+    let ident = ident.to_string();
+    let exp = now_utc_plus_sec_str(duration_sec);
+
+    // -- sign
+    let sign_b64u = _token_sign_into_b64u(&ident, &exp, salt,key)?;
+
+    Ok(Token { ident, exp, sign_b64u })
 }
 
 
@@ -80,7 +86,22 @@ fn _validate_token_sign_and_exp(
     salt: &str,
     key: &[u8]
 ) -> Result<()>{
-    todo!()
+    // Validate
+    let new_sign_b64_u = _token_sign_into_b64u(&original_token.ident, &original_token.exp, salt,key)?;
+
+    if new_sign_b64_u != original_token.sign_b64u {
+        return Err(Error::TokenSignatureNotMatching)
+    }
+
+    // Validate expiration
+    let origin_exp = parse_utc(&original_token.exp).map_err(|_| Error::TokenExpNotIso)?;
+
+    let now = now_utc();
+    if origin_exp < now {
+        return Err(Error::TokenExpired)
+    }
+
+    Ok(())
 }
 
 fn _token_sign_into_b64u(
@@ -89,15 +110,27 @@ fn _token_sign_into_b64u(
     salt: &str,
     key: &[u8]
 ) -> Result<String> {
-    todo!()
+    let content = format!("{}.{}", b64u_encode(ident), b64u_encode(exp));
+    let signature = encrypt_into_b64u(
+        key,
+        &EncryptContent {
+            content,
+            salt: salt.to_string(),
+        }
+    )?;
+
+    Ok(signature)
 }
 // endregion:  --- (private) Token Generation and Validation
 
 // region: --- Tests
 #[cfg(test)]
 mod tests {
+    use std::thread;
+    use std::time::Duration;
     use super::*;
     use anyhow::Result;
+    use dotenv::dotenv;
 
     #[test]
     fn test_token_display_ok() -> Result<()> {
@@ -131,6 +164,52 @@ mod tests {
         // -- Check
         // assert_eq!(token, fx_token);
         assert_eq!(format!("{token:?}"), format!("{fx_token:?}"));
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_validate_web_token_ok() -> Result<()> {
+        // -- Fixture
+        dotenv().ok();
+        let fx_user = "user_one";
+        let fx_salt = "pepper";
+        let fx_duration = 0.02;  // 20 ms
+        let token_key = &config().TOKEN_KEY;
+
+        let fx_token = _generate_token(fx_user, fx_duration, fx_salt, token_key)?;
+
+        // -- Exec
+        thread::sleep(Duration::from_millis(10));
+        let res = validate_token(&fx_token, fx_salt);
+
+        // -- Check
+        res?;
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_validate_web_token_expired() -> Result<()> {
+        // -- Fixture
+        dotenv().ok();
+        let fx_user = "user_one";
+        let fx_salt = "pepper";
+        let fx_duration = 0.01;  // 20 ms
+        let token_key = &config().TOKEN_KEY;
+
+        let fx_token = _generate_token(fx_user, fx_duration, fx_salt, token_key)?;
+
+        // -- Exec
+        thread::sleep(Duration::from_millis(20));
+        let res = validate_token(&fx_token, fx_salt);
+
+        // -- Check
+        assert!(res.is_err());
+        assert!(
+            matches!(res, Err(Error::TokenExpired)),
+            "should have matched `Err(Error::TokenExpired` but was `{res:?}`"
+        );
 
         Ok(())
     }
