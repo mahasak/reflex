@@ -1,4 +1,4 @@
-use crate::web::{self, Error, Result};
+use crate::web::{self, remove_token_cookies, Error, Result};
 use axum::routing::post;
 use axum::{Json, Router};
 use axum::extract::State;
@@ -13,7 +13,10 @@ use crate::model::user::{UserBmc, UserForLogin};
 
 pub fn routes(mm: ModelManager) -> Router {
 
-	Router::new().route("/api/login", post(api_login_handler)).with_state(mm)
+	Router::new()
+		.route("/api/login", post(api_login_handler))
+		.route("/api/logoff", post(api_logoff_handler))
+		.with_state(mm)
 }
 
 async fn api_login_handler(
@@ -55,6 +58,33 @@ async fn api_login_handler(
 	let body = Json(json!({
 		"result": {
 			"success": true
+		}
+	}));
+
+	Ok(body)
+}
+
+#[derive(Deserialize, Debug)]
+struct LogoffPayload {
+	logoff: bool
+}
+
+
+
+async fn api_logoff_handler(
+	cookies: Cookies,
+	Json(payload): Json<LogoffPayload>,
+)-> Result<Json<Value>>  {
+	debug!(" {:<12} - api_logoff_handler", "HANDLER");
+	let should_logoff = payload.logoff;
+
+	if should_logoff {
+		remove_token_cookies(&cookies)?;
+	}
+
+	let body = Json(json!({
+		"result": {
+			"logged_off": true
 		}
 	}));
 
