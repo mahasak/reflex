@@ -9,6 +9,7 @@ mod error;
 mod log;
 mod model;
 mod web;
+mod utils;
 
 pub mod _dev_utils;
 

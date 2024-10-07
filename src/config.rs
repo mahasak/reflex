@@ -19,7 +19,7 @@ pub struct Config {
     pub WEB_FOLDER: String,
     pub PWD_KEY: Vec<u8>,
     pub TOKEN_KEY: Vec<u8>,
-    pub TOKEN_DURATION_SEC: i64,
+    pub TOKEN_DURATION_SEC: f64,
 }
 
 impl Config {

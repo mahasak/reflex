@@ -4,14 +4,9 @@ pub type Result<T> = core::result::Result<T, Error>;
 
 #[derive(Debug, Serialize)]
 pub enum Error {
-    // Key
-    KeyFailHmac,
-    // Pwd
-    PwdNotMatching,
-    // Token
-    TokenInvalidFormat,
-    TokenCannotDecodeIdent,
-    TokenCannotDecodeExp
+    // Parse
+    DateFailParse(String),
+    FailToBase64Decode,
 }
 
 // region:    --- Error Boilerplate

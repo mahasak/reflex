@@ -1,6 +1,7 @@
 // region: --- Modules
 mod error;
 pub mod pwd;
+pub mod token;
 
 use base64_url::base64;
 pub use self::error::{Error, Result};
