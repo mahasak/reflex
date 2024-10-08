@@ -18,7 +18,43 @@ async fn main() -> Result<()> {
 	);
 	req_login.await?.print().await?;
 
-	hc.do_get("/hello").await?.print().await?;
+	// hc.do_get("/hello").await?.print().await?;
+
+	let req_create_task = hc.do_post(
+		"/api/rpc",
+		json!({
+			"id": "t1",
+			"method": "create_task",
+			"params": {
+				"data": {
+					"title": "title1"
+				}
+			}
+		})
+	);
+	req_create_task.await?.print().await?;
+
+	let req_list_task = hc.do_post(
+		"/api/rpc",
+		json!({
+			"id": "t1",
+			"method": "list_task"
+		})
+	);
+	req_list_task.await?.print().await?;
+
+	let req_delete_task = hc.do_post(
+		"/api/rpc",
+		json!({
+			"id": "t1",
+			"method": "delete_task",
+			"params": {
+				"id": 9999
+			}
+		})
+	);
+	req_delete_task.await?.print().await?;
+	
 
 	let req_logoff = hc.do_post(
 		"/api/logoff",
@@ -28,7 +64,7 @@ async fn main() -> Result<()> {
 	);
 	req_logoff.await?.print().await?;
 
-	hc.do_get("/hello").await?.print().await?;
+	// hc.do_get("/hello").await?.print().await?;
 
 	Ok(())
 }
