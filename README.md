@@ -43,6 +43,11 @@ cargo watch -q -c -x "test -- --nocapture"
 cargo watch -q -c -x "test model::task::tests::test_create -- --nocapture"
 ```
 
+## Check Test Coverage
+```angular2html
+cargo llvm-cov --html
+```
+
 ## Dev
 
 ```sh
