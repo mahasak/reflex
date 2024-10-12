@@ -12,7 +12,7 @@ use config::web_config;
 
 use crate::web::mw_auth::{mw_ctx_require, mw_ctx_resolve};
 use crate::web::mw_res_map::mw_response_map;
-use crate::web::{routes_login, routes_rpc, routes_static};
+use crate::web::{routes_login, routes_messenger, routes_rpc, routes_static};
 use axum::{middleware, Router};
 use lib_core::_dev_utils;
 use lib_core::model::ModelManager;
@@ -41,9 +41,12 @@ async fn main() -> Result<()> {
 	let routes_rpc = routes_rpc::routes(mm.clone())
 		.route_layer(middleware::from_fn(mw_ctx_require));
 
+	let routes_messenger = routes_messenger::routes(mm.clone());
+
 	let routes_all = Router::new()
 		.merge(routes_login::routes(mm.clone()))
 		.nest("/api", routes_rpc)
+		.nest("/webhook", routes_messenger)
 		.layer(middleware::map_response(mw_response_map))
 		.layer(middleware::from_fn_with_state(mm.clone(), mw_ctx_resolve))
 		.layer(CookieManagerLayer::new())
