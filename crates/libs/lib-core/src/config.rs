@@ -15,9 +15,6 @@ pub fn core_config() -> &'static CoreConfig {
 pub struct CoreConfig {
     // -- Db
     pub DB_URL: String,
-
-    // -- Web
-    pub WEB_FOLDER: String,
 }
 
 impl CoreConfig {
@@ -25,9 +22,6 @@ impl CoreConfig {
         Ok(CoreConfig {
             // -- Db
             DB_URL: get_env("SERVICE_DB_URL")?,
-
-            // -- Web
-            WEB_FOLDER: get_env("SERVICE_WEB_FOLDER")?,
         })
     }
 }
