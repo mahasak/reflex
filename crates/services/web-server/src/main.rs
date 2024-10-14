@@ -14,6 +14,7 @@ use crate::web::mw_auth::{mw_ctx_require, mw_ctx_resolve};
 use crate::web::mw_res_map::mw_response_map;
 use crate::web::{routes_login, routes_messenger, routes_rpc, routes_static};
 use axum::{middleware, Router};
+use dotenv::dotenv;
 use lib_core::_dev_utils;
 use lib_core::model::ModelManager;
 use tokio::net::TcpListener;
@@ -25,6 +26,7 @@ use tracing_subscriber::EnvFilter;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+	dotenv().ok();
 	tracing_subscriber::fmt()
 		.without_time() // For early local development.
 		.with_target(false)

@@ -1,10 +1,12 @@
 use lib_utils::envs::{get_env_b64u_as_u8s, get_env_parse};
 use std::sync::OnceLock;
+use dotenv::dotenv;
 
 pub fn auth_config() -> &'static AuthConfig {
     static INSTANCE: OnceLock<AuthConfig> = OnceLock::new();
 
     INSTANCE.get_or_init(|| {
+        dotenv().ok();
         AuthConfig::load_from_env().unwrap_or_else(|ex| {
             panic!("FATAL - WHILE LOADING CONF - Cause: {ex:?}")
         })

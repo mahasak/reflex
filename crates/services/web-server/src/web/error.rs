@@ -8,6 +8,7 @@ use lib_core::model;
 use serde::Serialize;
 use serde_with::{serde_as, DisplayFromStr};
 use tracing::debug;
+use crate::web::routes_messenger;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
@@ -37,7 +38,6 @@ pub enum Error {
     Token(token::Error),
     #[from]
     Rpc(lib_rpc::Error),
-
     // -- External Modules
     #[from]
     SerdeJson(#[serde_as(as = "DisplayFromStr")] serde_json::Error),

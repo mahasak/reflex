@@ -20,6 +20,7 @@ sha2 = "0.10"
 # -- Hashing (pwd-scheme02)
 argon2 = {version="0.5", features=["std"]}
 # -- Others
+dotenv = "0.15"
 uuid = {version = "1", features = ["v4","fast-rng",]}
 lazy-regex = "3"
 

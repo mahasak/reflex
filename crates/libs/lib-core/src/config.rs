@@ -1,10 +1,12 @@
 use lib_utils::envs::get_env;
 use std::sync::OnceLock;
+use dotenv::dotenv;
 
 pub fn core_config() -> &'static CoreConfig {
     static INSTANCE: OnceLock<CoreConfig> = OnceLock::new();
 
     INSTANCE.get_or_init(|| {
+        dotenv().ok();
         CoreConfig::load_from_env().unwrap_or_else(|ex| {
             panic!("FATAL - WHILE LOADING CONF - Cause: {ex:?}")
         })
