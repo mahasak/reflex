@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  api:
+    image: mahasak/reflex:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+      - "3001:12201"
+    env_file:
+      - ".env"
+    logging:
+      driver: "gelf"
+      options:
+        gelf-address: "udp://0.0.0.0:12201"
+        tag: "first-logs"
