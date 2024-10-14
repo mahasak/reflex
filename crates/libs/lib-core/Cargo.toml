@@ -29,6 +29,7 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 # -- Others
 dotenv = "0.15"
+redis = { version = "0.26.1", features = ["tokio-comp"] }
 uuid = {version = "1", features = ["v4","fast-rng",]}
 derive_more = {version = "1.0.0-beta", features = ["from"] }
 
