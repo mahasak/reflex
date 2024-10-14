@@ -27,6 +27,7 @@ tower-cookies = "0.10"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 # -- Others
+dotenv = "0.15"
 uuid = {version = "1", features = ["v4","fast-rng",]}
 strum_macros = "0.25"
 derive_more = {version = "1.0.0-beta", features = ["from"] }

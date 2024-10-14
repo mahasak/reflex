@@ -24,6 +24,9 @@ mod error;
 mod store;
 pub mod task;
 pub mod user;
+pub mod merchant_channel;
+pub mod messenger_webhook;
+pub mod merchant_config;
 
 pub use self::error::{Error, Result};
 
