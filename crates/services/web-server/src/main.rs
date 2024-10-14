@@ -21,7 +21,7 @@ use tokio::net::TcpListener;
 use tower_cookies::CookieManagerLayer;
 use tracing::info;
 use tracing_subscriber::EnvFilter;
-
+use lib_core::cache::CacheService;
 // endregion: --- Modules
 
 #[tokio::main]
@@ -34,16 +34,18 @@ async fn main() -> Result<()> {
 		.init();
 
 	// -- FOR DEV ONLY
-	_dev_utils::init_dev().await;
+	// _dev_utils::init_dev().await;
 
 	// Initialize ModelManager.
 	let mm = ModelManager::new().await?;
+
+	let cache = CacheService::init().await;
 
 	// -- Define Routes
 	let routes_rpc = routes_rpc::routes(mm.clone())
 		.route_layer(middleware::from_fn(mw_ctx_require));
 
-	let routes_messenger = routes_messenger::routes(mm.clone());
+	let routes_messenger = routes_messenger::routes(mm.clone(), cache.clone());
 
 	let routes_all = Router::new()
 		.merge(routes_login::routes(mm.clone()))

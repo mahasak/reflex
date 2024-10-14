@@ -1,9 +1,10 @@
-use axum::extract::{Query, State};
+use axum::extract::{FromRef, Query, State};
 use axum::{debug_handler, Json, Router};
 use axum::routing::{get, post};
 use serde_json::{json, Value};
 use tower_cookies::Cookies;
 use tracing::{debug, info};
+use lib_core::cache::CacheService;
 use lib_core::model::ModelManager;
 use crate::web_config;
 use lib_core::ctx::Ctx;
@@ -13,12 +14,17 @@ use lib_core::model::messenger_webhook::{MessengerVerifySubscription, MessengerW
 use crate::web::mw_auth::CtxW;
 
 use crate::web::{self, remove_token_cookie, Error, Result};
+#[derive(Clone, FromRef)]
+pub struct SharedState {
+    pub(crate) mm: ModelManager,
+    pub(crate) cache: CacheService,
+}
 
-pub fn routes(mm: ModelManager) -> Router {
+pub fn routes(mm: ModelManager, cache: CacheService) -> Router {
     Router::new()
         .route("/v1/messenger", post(messenger_post_handler))
         .route("/v1/messenger", get(messenger_get_handler))
-        .with_state(mm)
+        .with_state(SharedState{ mm, cache})
 }
 
 async fn messenger_get_handler(
@@ -58,6 +64,7 @@ async fn messenger_get_handler(
 
 async fn messenger_post_handler(
     State(_mm): State<ModelManager>,
+    State(_cache): State<CacheService>,
     Json(payload): Json<MessengerWebhook>,
 ) -> Result<Json<Value>> {
     debug!("{:<12} - messenger_post_handler", "HANDLER");
