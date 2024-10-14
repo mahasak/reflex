@@ -58,6 +58,10 @@ create table "merchant_channel"
     ref_type   character varying(100) not null,
     token      character varying(500) not null
 );
+
+
+
+
 create unique index merchant_channel_ref_id_ref_type_key on merchant_channel using btree (ref_id, ref_type);
 
 
