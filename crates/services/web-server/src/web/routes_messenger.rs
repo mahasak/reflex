@@ -81,7 +81,6 @@ async fn messenger_post_handler(
                 &_mm,
                 &page_id.clone()
             ).await?;
-
             match merchant_channel {
                 None => info!("{:<12} - Eligibility: No, Page ID {} is not registered", "MESSENGER_WEBHOOK", page_id.clone()),
                 Some(merchant_channel) => {
